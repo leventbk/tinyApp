@@ -11,7 +11,7 @@ const urlDatabase = { //JSON object
 };
 
 function generateShortURL() {
-	const shortURL = '';
+	let shortURL = '';
 	const length = 6;
 	const characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
  
@@ -37,6 +37,13 @@ app.get("/urls", (req, res) => {
 
 app.get("/urls/new", (req, res) => {
 	res.render("urls_new");
+})
+
+app.get("/u/:id", (req, res) => {
+  	// const longURL = ...
+	const longURL = req;
+
+	res.redirect(longURL);
 })
 
 app.get("/urls/:id", (req, res) => {
