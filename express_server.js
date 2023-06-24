@@ -23,7 +23,8 @@ app.get("/urls", (req, res) => {
 })
 
 app.get("/urls/:id", (req, res) => {
-	const templateVars = { id: req.params.id, longURL: urlDatabase.keyb2xVn2};
+	const id = req.params.id;
+	const templateVars = { id: id, longURL: urlDatabase[id]};
 	res.render("urls_show", templateVars);
   });
 
