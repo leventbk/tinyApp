@@ -10,8 +10,16 @@ const urlDatabase = { //JSON object
   "9sm5xK": "http://www.google.com"
 };
 
-function generateRandomString() {
-	
+function generateShortURL() {
+	const shortURL = '';
+	const length = 6;
+	const characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+ 
+	for (let i = 0; i < length; i++) {
+		const randomIndex = Math.floor(Math.random() * characters.length);
+		shortURL += characters[randomIndex];
+	}
+	return shortURL;
 }
 
 app.get("/", (req, res) => {
