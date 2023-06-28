@@ -33,10 +33,7 @@
         <tbody>
           <% for (let id in urls) { %>
             <tr>
-              <!-- <td>
-                <a target="_blank" href="/u/<%= id %>"></a> <%= id %>
-              </td> -->
-              <td><%= id %></td>
+              <td><a target="_blank" href="/u/<%= id %>"><%= id %></a></td>
               <td><%= urls[id] %></td>
               <td>
                 <form method="GET" action="/urls/<%= id%>/">
