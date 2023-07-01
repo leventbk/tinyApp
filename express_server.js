@@ -5,27 +5,63 @@ function generateShortURL() {
  
   for (let i = 0; i < length; i++) {
     const randomIndex = Math.floor(Math.random() * characters.length);
-    shortURL += characters[randomIndex];
+    shortURL.push(characters[randomIndex]);
   }
-  return shortURL;
+  return shortURL.join("");
+};
+
+function urlsForUser(id) {
+  const urls = {};
+  for ( const item in urlDatabase) {
+    if ( urlDatabase[item].userID === id) {
+      urls[item] = urlDatabase[item];
+    }
+  }
+  return urls;
 }
 
 const express = require('express');
-//const cookieParser = require('cookie-parser');
+const cookieParser = require('cookie-parser');
+const cookieSession = requir('cookie-session');
+const bcrypt = require('bcryptjs');
 const app = express();
 const PORT = 8080; // default port 8080
 
 app.set('view engine', 'ejs');
 
-const urlDatabase = { //JSON object
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+//Database
+const urlDatabase = {
+  b6UTxQ: {
+    longURL: "http://www.leventkarakus.com",
+    userID: "aJ48lW",
+  },
+  i3BoGr: {
+    longURL: "https://www.google.ca",
+    userID: "aJ48lW",
+  },
+};
+
+const users = {
+  "aJ48lW": {
+    id: "aJ48lW",
+    email: "user@example.com",
+    password: "purple-monkey-dinosaur",
+  },
+  user2RandomID: {
+    id: "randomID",
+    email: "user2@example.com",
+    password: "idioticGamer",
+  },
 };
 
 //middleware app.use
 app.use(express.urlencoded({ extended: true})); //will convert the request body from a Buffer into string (If you find that req.body is undefined, it may be that the body-parser middleware is not being run correctly.)
-
-//app.use(cookieParser());
+app.use(cookieSession({
+  name: 'session',
+  keys: ['keys1'],
+  maxAge: 24 * 60 * 60 * 1000 // 24 hours
+}))
+app.use(cookieParser());
 
 
 app.get("/", (req, res) => {
@@ -54,10 +90,10 @@ app.get("/urls/new", (req, res) => {
   res.render("urls_new");
 });
 
-// app.get('/urls/:id', (req, res) => {
-//   const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id], username: req.cookies["username"] };
-//   res.render('urls_show', templateVars);
-// });
+app.get('/urls/:id', (req, res) => {
+  const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id], username: req.cookies["username"] };
+  res.render('urls_show', templateVars);
+});
 app.get('/urls/:id', (req, res) => {
 	const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id], username: req.cookies["username"] };
 	res.render('urls_show', templateVars);
