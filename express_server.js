@@ -22,7 +22,7 @@ function urlsForUser(id) {
 
 const express = require('express');
 const cookieParser = require('cookie-parser');
-const cookieSession = requir('cookie-session');
+const cookieSession = require('cookie-session');
 const bcrypt = require('bcryptjs');
 const app = express();
 const PORT = 8080; // default port 8080
@@ -59,8 +59,7 @@ app.use(express.urlencoded({ extended: true})); //will convert the request body 
 app.use(cookieSession({
   name: 'session',
   keys: ['keys1'],
-  maxAge: 24 * 60 * 60 * 1000 // 24 hours
-}))
+  maxAge: 24 * 60 * 60 * 1000 }));
 app.use(cookieParser());
 
 
@@ -70,15 +69,22 @@ app.get("/", (req, res) => {
 
 // Create
 app.post("/urls", (req, res) => {
+  if (!req.session.user_id) {
+    return res.send('Only logged in users can shorten URLs.');
+  }
   let longURL = req.body.longURL;
   const shortURL = generateRandomString();
-  urlDatabase[shortURL] = longURL;
+  urlDatabase[shortURL] = { longURL, userID: req.session.user_id };
   res.redirect(`/urls/${shortURL}`);
 });
-//OK read
-app.get("/urls", (req, res) => {
-	const templateVars = { urls: urlDatabase };
-	res.render("urls_index", templateVars);
+
+// Read
+app.get('/urls', (req, res) => {
+  if (!req.session.user_id) {
+    return res.send('Please log in or register first');
+  }
+  const templateVars = { urls: urlsForUser(req.session.user_id), user: users[req.session.user_id] };
+  res.render('urls_index', templateVars);
 });
   
 app.get('/urls.json', (req, res) => {
@@ -107,10 +113,10 @@ app.get("/urls/:id", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
-// app.post("/urls", (req, res) => {
-// 	console.log(req.body); // Log the POST request body to the console
-// 	res.send("Ok"); // Respond with 'Ok' (we will replace this)
-//   });
+app.post("/urls", (req, res) => {
+	console.log(req.body); // Log the POST request body to the console
+	res.send("Ok"); // Respond with 'Ok' (we will replace this)
+  });
 //create
 app.post("/urls", (req, res) => {
   let longURL = req.body.longURL;
@@ -145,7 +151,16 @@ app.post('/urls/:id', (req, res) => {
 
 // /login
 app.post('/login', (req, res) => {
-  res.cookie('username', req.body.username);
+  const email = req.body.email;
+  const password = re.body.password;
+  const user = findUserByEmail(email);
+
+  if (!user) {
+    res.status(403).send('The user does not exist.')
+  }
+  if (!bcrypt.compareSync(password, user.hashedPassword)) {
+    res.status(403).send('Password does not match')
+  }
   res.redirect('/urls');
 });
   
@@ -155,6 +170,14 @@ app.post('/logout', (req, res) => {
   res.redirect('/urls');
 });
 
+app.get('/login', (req, res) => {
+  if (req.session.user_id) {
+    res.redirect('/urls');
+  }
+  const templateVars = { user: users[req.session.user_id] };
+  res.render('login', templateVars);
+
+});
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
