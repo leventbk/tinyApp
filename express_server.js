@@ -144,7 +144,17 @@ app.get('/u/:id', (req, res) => {
 
 //UPDATE
 app.post('/urls/:id', (req, res) => {
-  urlDatabase[req.params.id] = req.body.editURL;
+  if (!Object.keys(urlDatabase).includes(req.params.id)) {
+    return res.send('This URL does not exist.');
+  }
+  if (!req.session.user_id) {
+    return res.send("Please log in first.");
+  }
+
+  if (req.session.user_id !== urlDatabase[req.params.id].userID) {
+    return res.send('You do not have access to this URL.');
+  }
+  urlDatabase[req.params.id].longURL = req.body.editURL;
   res.redirect('/urls');
 });
 
