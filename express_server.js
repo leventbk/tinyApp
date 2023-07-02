@@ -8,7 +8,7 @@ function generateShortURL() {
     shortURL.push(characters[randomIndex]);
   }
   return shortURL.join("");
-};
+}
 
 function urlsForUser(id) {
   const urls = {};
@@ -18,7 +18,8 @@ function urlsForUser(id) {
     }
   }
   return urls;
-};
+}
+
 
 const express = require('express');
 const cookieSession = require('cookie-session');
@@ -29,9 +30,9 @@ const PORT = 8080;
 
 app.set('view engine', 'ejs');
 
-
-// DATABASES 
-
+//////////////
+// DATABASES
+//////////////
 const urlDatabase = {
   b6UTxQ: {
     longURL: "https://www.tsn.ca",
@@ -45,8 +46,8 @@ const urlDatabase = {
 
 
 const users = {
-  "aJ48lW": {
-    id: "aJ48lW",
+  userRandomID: {
+    id: "userRandomID",
     email: "user@example.com",
     password: "purple-monkey-dinosaur",
   },
@@ -56,22 +57,25 @@ const users = {
     password: "dishwasher-funk",
   },
 };
-
+//////////////
 // Middleware
+//////////////
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieSession({
   name: 'session',
   keys: ["key1"],
 
-  // Cookie Options
+  // Cookie Lifetime Options
   maxAge: 24 * 60 * 60 * 1000 // 24 hours
-}))
+}));
 
 app.get('/', (req, res) => {
-  res.send('Hello!');
+  res.send('Hello! for tinyApp pls continue to /urls  <br><br> but do it yourself on address bar :) ');
 });
 
+//////////////
 // Create
+//////////////
 app.post("/urls", (req, res) => {
   if (!req.session.user_id) {
     return res.send('Only logged in users can shorten URLs.');
@@ -82,7 +86,9 @@ app.post("/urls", (req, res) => {
   res.redirect(`/urls/${shortURL}`);
 });
 
-// Delete
+//////////////
+// Detele
+//////////////
 app.post('/urls/:id/delete', (req, res) => {
   if (!Object.keys(urlDatabase).includes(req.params.id)) {
     return res.send('This url does not exist.');
@@ -99,7 +105,9 @@ app.post('/urls/:id/delete', (req, res) => {
   res.redirect('/urls');
 });
 
+//////////////
 // Read
+//////////////
 app.get('/urls', (req, res) => {
   if (!req.session.user_id) {
     return res.send('Please log in or register first');
@@ -133,7 +141,9 @@ app.get('/urls/:id', (req, res) => {
   res.render('urls_show', templateVars);
 });
 
-//UPDATE
+//////////////
+// Update
+//////////////
 app.post('/urls/:id', (req, res) => {
   if (!Object.keys(urlDatabase).includes(req.params.id)) {
     return res.send('This URL does not exist.');
@@ -171,9 +181,11 @@ app.get('/hello', (req, res) => {
 });
 
 
+//////////////////
 // AUTHENTICATION
+//////////////////
 
-// /login 
+// Login
 app.post('/login', (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
@@ -190,7 +202,16 @@ app.post('/login', (req, res) => {
 
   req.session.user_id = user.id;
   res.redirect('/urls');
+});
 
+app.get('/login', (req, res) => {
+  
+  if (req.session.user_id) {
+    res.redirect('/urls');
+  }
+  
+  const templateVars = { user: users[req.session.user_id] };
+  res.render('login', templateVars);
 });
 
 // logout
@@ -199,7 +220,9 @@ app.post('/logout', (req, res) => {
   res.redirect('/login');
 });
 
-// Registeration page
+//////////////////
+// Registeration
+//////////////////
 app.get('/register', (req, res) => {
   if (req.session.user_id) {
     res.redirect('/urls');
@@ -214,7 +237,7 @@ function findUserByEmail(email) {
     }
   }
   return null;
-};
+}
 
 app.post('/register', (req, res) => {
   const email = req.body.email;
@@ -239,14 +262,6 @@ app.post('/register', (req, res) => {
   res.redirect('/urls');
 });
 
-app.get('/login', (req, res) => {
-  if (req.session.user_id) {
-    res.redirect('/urls');
-  }
-  const templateVars = { user: users[req.session.user_id] };
-  res.render('login', templateVars);
-
-});
 
 
 app.listen(PORT, () => {
