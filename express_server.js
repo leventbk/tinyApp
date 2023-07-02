@@ -20,7 +20,9 @@ function urlsForUser(id) {
   return urls;
 }
 
-
+//////////////
+// App Configuration and modules
+//////////////
 const express = require('express');
 const cookieSession = require('cookie-session');
 const bcrypt = require("bcryptjs");
@@ -69,44 +71,22 @@ app.use(cookieSession({
   maxAge: 24 * 60 * 60 * 1000 // 24 hours
 }));
 
+////////////////////////////////////////////////////////
+// Routing
+////////////////////////////////////////////////////////
+
+// ROOT 
 app.get('/', (req, res) => {
-  res.send('Hello! for tinyApp pls continue to /urls  <br><br> but do it yourself on address bar :) ');
+  // res.send('Hello! for tinyApp pls continue to /urls  <br><br> but do it yourself on address bar :) ');
+  if (req.session.userID) {
+    res.redirect('/urls');
+  } else {
+    res.redirect('/login');
+  }
 });
 
 //////////////
-// Create
-//////////////
-app.post("/urls", (req, res) => {
-  if (!req.session.user_id) {
-    return res.send('Only logged in users can shorten URLs.');
-  }
-  let longURL = req.body.longURL;
-  const shortURL = generateShortURL();
-  urlDatabase[shortURL] = { longURL, userID: req.session.user_id };
-  res.redirect(`/urls/${shortURL}`);
-});
-
-//////////////
-// Detele
-//////////////
-app.post('/urls/:id/delete', (req, res) => {
-  if (!Object.keys(urlDatabase).includes(req.params.id)) {
-    return res.send('This url does not exist.');
-  }
-
-  if (!req.session.user_id) {
-    return res.send('Please log in first.');
-  }
-  if (urlDatabase[req.params.id].userID !== req.session.user_id) {
-    return res.send('You do not have permission to delete this URL.');
-  }
-
-  delete urlDatabase[req.params.id];
-  res.redirect('/urls');
-});
-
-//////////////
-// Read
+// URLs Index Page - GET
 //////////////
 app.get('/urls', (req, res) => {
   if (!req.session.user_id) {
@@ -139,6 +119,38 @@ app.get('/urls/:id', (req, res) => {
 
   const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id].longURL, user: users[req.session.user_id] };
   res.render('urls_show', templateVars);
+//////////////
+// 
+//////////////
+app.post("/urls", (req, res) => {
+  if (!req.session.user_id) {
+    return res.send('Only logged in users can shorten URLs.');
+  }
+  let longURL = req.body.longURL;
+  const shortURL = generateShortURL();
+  urlDatabase[shortURL] = { longURL, userID: req.session.user_id };
+  res.redirect(`/urls/${shortURL}`);
+});
+
+//////////////
+// Detele
+//////////////
+app.post('/urls/:id/delete', (req, res) => {
+  if (!Object.keys(urlDatabase).includes(req.params.id)) {
+    return res.send('This url does not exist.');
+  }
+
+  if (!req.session.user_id) {
+    return res.send('Please log in first.');
+  }
+  if (urlDatabase[req.params.id].userID !== req.session.user_id) {
+    return res.send('You do not have permission to delete this URL.');
+  }
+
+  delete urlDatabase[req.params.id];
+  res.redirect('/urls');
+});
+
 });
 
 //////////////
@@ -216,8 +228,8 @@ app.get('/login', (req, res) => {
 
 // logout
 app.post('/logout', (req, res) => {
-  res.clearCookie('user_id');
-  res.redirect('/login');
+  res.clearCookie('session');
+  res.redirect('/urls');
 });
 
 //////////////////
