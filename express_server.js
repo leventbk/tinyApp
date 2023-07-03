@@ -90,7 +90,7 @@ app.get('/', (req, res) => {
 //////////////
 app.get('/urls', (req, res) => {
   if (!req.session.user_id) {
-    return res.send('Please log in or register first');
+    return res.redirect('/login');
   }
   const templateVars = { urls: urlsForUser(req.session.user_id), user: users[req.session.user_id] };
   res.render('urls_index', templateVars);
@@ -278,7 +278,7 @@ app.post('/register', (req, res) => {
 
 
 app.listen(PORT, () => {
-  console.log(`Example app listening on port ${PORT}!`);
+  console.log(`TinyApp listening on port ${PORT}!`);
 });
 
 // console.log(bcrypt.compareSync("purple-monkey-dinosaur", hashedPassword));
