@@ -138,7 +138,7 @@ app.post("/urls", (req, res) => {
 //////////////
 app.post('/urls/:id/delete', (req, res) => {
   if (!Object.keys(urlDatabase).includes(req.params.id)) {
-    return res.send('This url does not exist.');
+    return res.send('This url does not exist!');
   }
 
   if (!req.session.user_id) {
@@ -151,6 +151,8 @@ app.post('/urls/:id/delete', (req, res) => {
   delete urlDatabase[req.params.id];
   res.redirect('/urls');
 });
+
+//});
 
 //////////////
 // Update
@@ -166,8 +168,10 @@ app.post('/urls/:id', (req, res) => {
   if (req.session.user_id !== urlDatabase[req.params.id].userID) {
     return res.send('You do not have access to this URL.');
   }
-  urlDatabase[req.params.id].longURL = req.body.editURL;
-  res.redirect('/urls');
+  // urlDatabase[req.params.id].longURL = req.body.editURL;
+  // res.redirect('/urls');
+  const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id].longURL, user: users[req.session.user_id] };
+  res.render('urls_show', templateVars);
 });
 
 app.get('/u/:id', (req, res) => {
