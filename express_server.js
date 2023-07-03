@@ -5,9 +5,9 @@ function generateShortURL() {
  
   for (let i = 0; i < length; i++) {
     const randomIndex = Math.floor(Math.random() * characters.length);
-    shortURL.push(characters[randomIndex]);
+    shortURL += characters[randomIndex]
   }
-  return shortURL.join("");
+  return shortURL;
 }
 
 function urlsForUser(id) {
@@ -199,13 +199,12 @@ app.get('/hello', (req, res) => {
 
 // Login
 app.post('/login', (req, res) => {
-  const email = req.body.email;
   const password = req.body.password;
-
-  const user = findUserByEmail(email);
+  const email = req.body.email;
+  const user = findUserByEmail(email, users);
 
   if (!user) {
-    res.status(403).send('This user does not exist.');
+    res.status(403).send('This account does not exist.');
   }
 
   if (!bcrypt.compareSync(password, user.hashedPassword)) {
@@ -226,7 +225,7 @@ app.get('/login', (req, res) => {
   res.render('login', templateVars);
 });
 
-// logout
+// logout - cookie cleaning - POST
 app.post('/logout', (req, res) => {
   res.clearCookie('session');
   res.redirect('/urls');
@@ -238,10 +237,12 @@ app.post('/logout', (req, res) => {
 app.get('/register', (req, res) => {
   if (req.session.user_id) {
     res.redirect('/urls');
+    return;
   }
   const templateVars = { user: users[req.session.user_id] };
   res.render('registration', templateVars);
 });
+
 function findUserByEmail(email) {
   for (const item in users) {
     if (users[item].email === email) {
@@ -279,3 +280,6 @@ app.post('/register', (req, res) => {
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
+
+// console.log(bcrypt.compareSync("purple-monkey-dinosaur", hashedPassword));
+// console.log(bcrypt.compareSync("pink-donkey-minotaur", hashedPassword));
