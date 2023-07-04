@@ -1,28 +1,7 @@
-function generateShortURL() {
-  let shortURL = '';
-  const length = 6;
-  const characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
- 
-  for (let i = 0; i < length; i++) {
-    const randomIndex = Math.floor(Math.random() * characters.length);
-    shortURL += characters[randomIndex]
-  }
-  return shortURL;
-}
-
-function urlsForUser(id) {
-  const urls = {};
-  for (const item in urlDatabase) {
-    if (urlDatabase[item].userID === id) {
-      urls[item] = urlDatabase[item];
-    }
-  }
-  return urls;
-}
-
 //////////////
 // App Configuration and modules
 //////////////
+const { findUserByEmail, generateShortURL, urlsForUser} = require('./helper');
 const express = require('express');
 const cookieSession = require('cookie-session');
 const bcrypt = require("bcryptjs");
@@ -30,35 +9,37 @@ const app = express();
 const PORT = 8080;
 
 
-app.set('view engine', 'ejs');
-
 //////////////
 // DATABASES
 //////////////
 const urlDatabase = {
   b6UTxQ: {
-    longURL: "https://www.tsn.ca",
-    userID: "aJ48lW",
+	  longURL: "https://www.tsn.ca",
+	  userID: "aJ48lW",
   },
   i3BoGr: {
-    longURL: "https://www.google.ca",
-    userID: "aJ48lW",
+	  longURL: "https://www.google.ca",
+	  userID: "aJ48lW",
   },
 };
-
-
+  
+  
 const users = {
   userRandomID: {
-    id: "userRandomID",
-    email: "user@example.com",
-    password: "purple-monkey-dinosaur",
+	  id: "userRandomID",
+	  email: "user@example.com",
+	  password: "purple-monkey-dinosaur",
   },
   user2RandomID: {
-    id: "user2RandomID",
-    email: "user2@example.com",
-    password: "dishwasher-funk",
+	  id: "user2RandomID",
+	  email: "user2@example.com",
+	  password: "dishwasher-funk",
   },
 };
+
+
+app.set('view engine', 'ejs');
+
 //////////////
 // Middleware
 //////////////
@@ -231,7 +212,7 @@ app.get('/login', (req, res) => {
 // logout - cookie cleaning - POST
 app.post('/logout', (req, res) => {
   res.clearCookie('session');
-  res.redirect('/urls');
+  res.redirect('/urls/login');
 });
 
 //////////////////
@@ -246,14 +227,14 @@ app.get('/register', (req, res) => {
   res.render('registration', templateVars);
 });
 
-function findUserByEmail(email) {
-  for (const item in users) {
-    if (users[item].email === email) {
-      return users[item];
-    }
-  }
-  return null;
-}
+// function findUserByEmail(email) {
+//   for (const item in users) {
+//     if (users[item].email === email) {
+//       return users[item];
+//     }
+//   }
+//   return null;
+// }
 
 app.post('/register', (req, res) => {
   const email = req.body.email;
