@@ -149,8 +149,8 @@ app.post('/urls/:id', (req, res) => {
   if (req.session.user_id !== urlDatabase[req.params.id].userID) {
     return res.send('You do not have access to this URL.');
   }
-  // urlDatabase[req.params.id].longURL = req.body.editURL;
-  // res.redirect('/urls');
+  urlDatabase[req.params.id].longURL = req.body.editURL;
+  res.redirect('/urls');
   const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id].longURL, user: users[req.session.user_id] };
   res.render('urls_show', templateVars);
 });
@@ -226,15 +226,6 @@ app.get('/register', (req, res) => {
   const templateVars = { user: users[req.session.user_id] };
   res.render('registration', templateVars);
 });
-
-// function getUserByEmail(email) {
-//   for (const item in users) {
-//     if (users[item].email === email) {
-//       return users[item];
-//     }
-//   }
-//   return null;
-// }
 
 app.post('/register', (req, res) => {
   const email = req.body.email;
