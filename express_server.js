@@ -1,7 +1,40 @@
+function getUserByEmail(email, users) {
+	for (const item in users) {
+	  if (users[item].email === email) {
+		const user = users[item];
+		return user;
+	  }
+	}
+	return undefined;
+};
+  
+function generateShortURL() {
+	let shortURL = '';
+	const length = 6;
+	const characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  
+	for (let i = 0; i < length; i++) {
+	  const randomIndex = Math.floor(Math.random() * characters.length);
+	  shortURL += characters[randomIndex];
+	}
+	return shortURL;
+}
+  
+function urlsForUser(id) { // helper func for loop over a database and return urls whose user id matches with the given user id.
+	const urls = {};
+	for (const item in urlDatabase) {
+	  if (urlDatabase[item].userID === id) {
+		urls[item] = urlDatabase[item];
+	  }
+	}
+	return urls;
+};
+
+
 //////////////
 // App Configuration and modules
 //////////////
-const { getUserByEmail, generateShortURL, urlsForUser} = require('./helpers');
+//const { getUserByEmail, generateShortURL, urlsForUser} = require('./helpers.js');
 const express = require('express');
 const cookieSession = require('cookie-session');
 const bcrypt = require("bcryptjs");
@@ -149,8 +182,8 @@ app.post('/urls/:id', (req, res) => {
   if (req.session.user_id !== urlDatabase[req.params.id].userID) {
     return res.send('You do not have access to this URL.');
   }
-  urlDatabase[req.params.id].longURL = req.body.editURL;
-  res.redirect('/urls');
+  // urlDatabase[req.params.id].longURL = req.body.editURL;
+  // res.redirect('/urls');
   const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id].longURL, user: users[req.session.user_id] };
   res.render('urls_show', templateVars);
 });
