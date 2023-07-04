@@ -1,4 +1,4 @@
-function findUserByEmail(email, users) {
+function getUserByEmail(email, users) {
 	for (const item in users) {
 	  if (users[item].email === email) {
 		const user = users[item];
@@ -33,7 +33,7 @@ function urlsForUser(id, urlDatabase) { // helper func for loop over a database 
   
   
 module.exports = {
-	findUserByEmail,
+	getUserByEmail,
 	generateShortURL,
 	urlsForUser
 };

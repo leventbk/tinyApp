@@ -1,7 +1,7 @@
 //////////////
 // App Configuration and modules
 //////////////
-const { findUserByEmail, generateShortURL, urlsForUser} = require('./helpers');
+const { getUserByEmail, generateShortURL, urlsForUser} = require('./helpers');
 const express = require('express');
 const cookieSession = require('cookie-session');
 const bcrypt = require("bcryptjs");
@@ -185,7 +185,7 @@ app.get('/hello', (req, res) => {
 app.post('/login', (req, res) => {
   const password = req.body.password;
   const email = req.body.email;
-  const user = findUserByEmail(email, users);
+  const user = getUserByEmail(email, users);
 
   if (!user) {
     res.status(403).send('This account does not exist.');
@@ -227,7 +227,7 @@ app.get('/register', (req, res) => {
   res.render('registration', templateVars);
 });
 
-// function findUserByEmail(email) {
+// function getUserByEmail(email) {
 //   for (const item in users) {
 //     if (users[item].email === email) {
 //       return users[item];
@@ -242,7 +242,7 @@ app.post('/register', (req, res) => {
   if (email === '' || password === '') {
     res.status(400).send('Email or password cannot be empty');
   }
-  const user = findUserByEmail(email);
+  const user = getUserByEmail(email);
   if (user) {
     res.status(400).send('User already exists');
   }
